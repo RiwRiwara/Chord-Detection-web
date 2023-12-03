@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container d-flex flex-column">
+    <div class="my-3 d-flex justify-content-center">
+        <label class="switch">
+            <input type="checkbox" id="toggleWebcam">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <video id="webcam" autoplay></video>
+        </div>
+        <div class="col-6">
+            <img id="processedImage" style="max-width: 100%;" />
+        </div>
+    </div>
+</div>
+
+<canvas id="canvas" style="display: none;"></canvas>
+
+<script src=" https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+    const videoElement = document.getElementById('webcam');
+    const toggleButton = document.getElementById('toggleWebcam');
+    const processedImageElement = document.getElementById('processedImage');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    let stream = null;
+    const socket = io(); // Establish WebSocket connection
+
+    toggleButton.addEventListener('change', function () {
+        if (this.checked) {
+            startWebcam();
+        } else {
+            stopWebcam();
+        }
+    });
+
+    function startWebcam() {
+        if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+
+                .then(function (mediaStream) {
+                    stream = mediaStream;
+                    videoElement.srcObject = stream;
+                    captureAndSendFrames(); // Start sending frames when the webcam is on
+                })
+                .catch(function (err) {
+                    console.log("Something went wrong!", err);
+                });
+        }
+    }
+
+    function stopWebcam() {
+        if (stream) {
+            let tracks = stream.getTracks();
+            tracks.forEach(track => track.stop());
+            videoElement.srcObject = null;
+            stream = null;
+        }
+    }
+
+    function captureFrame() {
+        if (stream) {
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            
+            return canvas.toDataURL('image/jpeg');
+        }
+        return null;
+    }
+
+    function captureAndSendFrames() {
+        const frameInterval = 100; // Adjust frame rate as needed
+        setInterval(() => {
+            const frame = captureFrame();
+            if (frame) {
+                socket.emit('frame', { image: frame });
+            }
+        }, frameInterval);
+    }
+
+    socket.on('response', function(data) {
+        // Update the processed image
+        processedImageElement.src = data.image;
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,152 @@
+<!-- 
+    Classic Black (#000000)
+    Dark Grey (#333333)
+    Deep Red (#9B0000)
+    Electric Blue (#0047AB)
+    Metallic Silver (#C0C0C0)
+    Cream White (#FFFDD0):
+ -->
+
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="container" id="apiStatus">
+    <div class="alert alert-warning" role="alert" >
+        <h4 class="fw-bold alert-heading">API Status</h4>
+        <p class="fs-3" id="apiStatusText">Loading...</p>
+    </div>
+</div>
+<div class="p-4 container shadow-lg" style="background-color: #ebe2e2; border-radius: 10px;">
+    <div class="my-4">
+        <h1 class="text-center special-heading " style="color: #9B0000;">Guitar&nbsp; Chord&nbsp; Detection<span
+                id="reicon" class="fw-bold m-2" onclick="refreshpage()"><svg xmlns="http://www.w3.org/2000/svg"
+                    width="32" height="32" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+                    <path
+                        d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+                </svg></span></h1>
+    </div>
+    <div class="row p-3 my-4 container"
+        style="border: 10px groove  #0047AB; border-radius: 10px;background-image: linear-gradient(45deg, rgb(236, 236, 236) 0%, rgba(93, 91, 91, 0.72) 47%, rgba(0, 0, 0, 0.99) 100%);">
+        <div class="col-md-4 rounded ">
+            <h2 style="color: #9B0000;
+                line-height: 1.75;
+                letter-spacing: 10px;
+                text-transform: uppercase" ;>Detail</h2>
+            <h3>FPS : <span id="fps">0</span></h3>
+            <h3>Chord : <span id="chord">None</span></h3>
+        </div>
+        <div class="col-md-8 d-flex justify-content-end gap-2">
+            <div class="d-flex flex-column mx-2">
+                <div class="text-center" style="color: white;">Select Chord</div>
+                <select id="chordSelect" class="form-select" style="background-color: #0047AB; color: #fff;">
+                    <option value="A">A</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                    <option value="F">F</option>
+                    <option value="G">G</option>
+                </select>
+                <button class="btn fs-5 my-3" style="background-color: #9B0000; color: #fff;"
+                    onclick="playSelectedSound()">Play sound</button>
+
+            </div>
+            <div class="d-flex flex-column mx-2">
+                <div class="text-center" style="color: white;">Auto play sound</div>
+                <div class="mb-4 d-flex justify-content-center">
+                    <label class="switch toggleautoplay">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="d-flex flex-column mx-2 justify-content-center">
+                    <div class="text-center" style="color: white;">Select BPM</div>
+                    <select id="bpmSelect" class="form-select">
+                        <option value="60">60 BPM</option>
+                        <option value="76">76 BPM</option>
+                        <option value="80">80 BPM</option>
+                        <option value="100">100 BPM</option>
+                        <option value="120">120 BPM</option>
+                    </select>
+                </div>
+
+                <!-- Your existing Auto Play Sound toggle and audio elements -->
+
+            </div>
+            <div class="d-flex flex-column" id="playArea">
+                <div class="text-center" style="color: white;">Your play</div>
+                <img id="chordImageNone" src="{{ url_for('static', filename='images/None.jpg') }}" alt="Chord Image"
+                    class="rounded playImg" style="width: 150px;height: 200px; border: 5px double  #C0C0C0;">
+
+                <img id="chordImageA" src="{{ url_for('static', filename='images/A.png') }}" alt="Chord Image"
+                    class="playImg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0; display: none;">
+                <img id="chordImageC" src="{{ url_for('static', filename='images/C.png') }}" alt="Chord Image"
+                    class="playImg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0; display: none;">
+                <img id="chordImageD" src="{{ url_for('static', filename='images/D.png') }}" alt="Chord Image"
+                    class="playImg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0;display: none;">
+                <img id="chordImageE" src="{{ url_for('static', filename='images/E.png') }}" alt="Chord Image"
+                    class="playImg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0;display: none;">
+                <img id="chordImageF" src="{{ url_for('static', filename='images/F.png') }}" alt="Chord Image"
+                    class="playImg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0;display: none;">
+                <img id="chordImageG" src="{{ url_for('static', filename='images/G.png') }}" alt="Chord Image"
+                    class="playImg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0;display: none;">
+            </div>
+
+            <div class="d-flex flex-column" id="selectArea">
+                <div class="text-center" style="color: white;">Selected</div>
+
+                <img id="chordImageSelectA" src="{{ url_for('static', filename='images/A.png') }}" alt="Chord Image"
+                    class="showimg rounded" style="width: 150px;height: 200px; border: 5px double  #C0C0C0;">
+                <img id="chordImageSelectC" src="{{ url_for('static', filename='images/C.png') }}" alt="Chord Image"
+                    class="showimg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0; display: none;">
+                <img id="chordImageSelectD" src="{{ url_for('static', filename='images/D.png') }}" alt="Chord Image"
+                    class="showimg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0;display: none;">
+                <img id="chordImageSelectE" src="{{ url_for('static', filename='images/E.png') }}" alt="Chord Image"
+                    class="showimg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0;display: none;">
+                <img id="chordImageSelectF" src="{{ url_for('static', filename='images/F.png') }}" alt="Chord Image"
+                    class="showimg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0;display: none;">
+                <img id="chordImageSelectG" src="{{ url_for('static', filename='images/G.png') }}" alt="Chord Image"
+                    class="showimg rounded"
+                    style="width: 150px;height: 200px; border: 5px double  #C0C0C0;display: none;">
+            </div>
+        </div>
+    </div>
+    <hr style="border: 5px solid #9B0000 ;" class="my-4">
+    <h2 class="text-center text-uppercase special-heading " style="font-size: 3rem;">User&nbsp; Camera</h2>
+
+    <div class="rounded-3 p-3 d-flex align-items-center justify-content-center container"
+        style="background-color: #0047AB;min-height: 500px;">
+        <p id="loadingIndicator" style="text-align:center;" class="text-white fs-2">Loading...</p>
+
+        <img id="videoStream" src="" alt="Video Stream" style="display:none; border: 10px groove #9B0000;"
+            class="rounded">
+    </div>
+</div>
+<!-- Audio elements for each chord -->
+<audio id="soundA" src="{{ url_for('static', filename='sounds/chord-A.wav') }}" preload="auto"></audio>
+<audio id="soundC" src="{{ url_for('static', filename='sounds/chord-C.wav') }}" preload="auto"></audio>
+<audio id="soundD" src="{{ url_for('static', filename='sounds/chord-D.wav') }}" preload="auto"></audio>
+<audio id="soundE" src="{{ url_for('static', filename='sounds/chord-E.wav') }}" preload="auto"></audio>
+<audio id="soundF" src="{{ url_for('static', filename='sounds/chord-F.wav') }}" preload="auto"></audio>
+<audio id="soundG" src="{{ url_for('static', filename='sounds/chord-G.wav') }}" preload="auto"></audio>
+
+
+<div id="customConfirm" class="custom-confirm" style="display: none;">
+    <div class="confirm-content">
+        <h2 class="">Are you sure you want to refresh window?</h2>
+        <button class="btn btn-danger" id="confirmBtn">Yes</button>
+        <button class="btn btn-secondary" id="cancelBtn">No</button>
+    </div>
+</div>
+{% endblock %}
