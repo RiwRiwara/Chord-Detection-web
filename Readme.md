@@ -1,5 +1,3 @@
-<!-- set TF_ENABLE_ONEDNN_OPTS=0 -->
-
 ### Installation
 
 ```
@@ -12,6 +10,7 @@
    ```
    cd Chord-Detection-web/
    ```
+2.5 You can use python virtual env.
 
 3. Install dependencies:
    ```
@@ -20,9 +19,9 @@
 
 4. Run the application:
    ```
-   python appEdit.py // Run production
-   python app.py //for run in openCV (test, and self train)
+   python application.py // Run production
+   python appTrain.py //for run in openCV (test, and self train)
    ```
 
-### Run
-- if python appEdit.py go to http://localhost:5099/page/index
+### View website
+- After run appTrain.py go to http://localhost:5099/page/index
